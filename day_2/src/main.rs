@@ -3,6 +3,11 @@ use std::io::BufReader;
 use std::io::prelude::*;
 use std::fs::File;
 
+fn main() {
+    solve_day_2_phase_1();
+    solve_day_2_phase_2();
+}
+
 struct PasswordPolicy {
     min: usize,
     max: usize,
@@ -45,8 +50,16 @@ fn xor(a: bool, b: bool) -> bool {
     return (a || b) && !(a && b);
 }
 
-pub fn solve_day_2_phase_1() -> usize {
-    let path = Path::new("src/day_2/day_2_input.txt");
+fn solve_day_2_phase_2() -> usize {
+    solve_day_2(2)
+}
+
+fn solve_day_2_phase_1() -> usize {
+    solve_day_2(1)
+}
+
+fn solve_day_2(phase: i32) -> usize {
+    let path = Path::new("day_2/src/day_2_input.txt");
     let file = BufReader::new(File::open(&path).unwrap());
 
     let valid_passwords = file.lines()
@@ -57,13 +70,13 @@ pub fn solve_day_2_phase_1() -> usize {
             let password = parsed_line[1].trim();
 
             let policy = PasswordPolicy::parse(policy_def);
-            return if policy.validate_phase_2(password) {
-                1
-            } else {
-                0
-            }
+            let valid =
+                if phase == 1 { policy.validate_phase_1(password) }
+                else { policy.validate_phase_2(password) };
+
+            return if valid { 1 } else { 0 }
         }).sum();
 
-    println!("Valid passwords {}", valid_passwords);
+    println!("Day 2 Phase {} => Valid passwords {}", phase, valid_passwords);
     return valid_passwords;
 }

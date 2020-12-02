@@ -4,7 +4,12 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::collections::HashMap;
 
-pub fn solve_problem_1_phase_1() -> i32 {
+fn main() {
+    solve_problem_1_phase_1();
+    solve_problem_1_phase_2();
+}
+
+fn solve_problem_1_phase_1() -> i32 {
     let input = read_input();
 
     for (num, count) in input.iter() {
@@ -21,9 +26,8 @@ pub fn solve_problem_1_phase_1() -> i32 {
     return -1;
 }
 
-pub fn solve_problem_1_phase_2() -> i32 {
+fn solve_problem_1_phase_2() -> i32 {
     let input = read_input();
-    println!("{:?}", input);
 
     for (num1, countNum1) in input.iter() {
         // 3a = 2020
@@ -57,7 +61,7 @@ pub fn solve_problem_1_phase_2() -> i32 {
 }
 
 fn read_input() -> HashMap<i32, i32> {
-    let path = Path::new("src/problem_1/phase_1_input.txt");
+    let path = Path::new("day_1/src/phase_1_input.txt");
     let file = BufReader::new(File::open(&path).unwrap());
 
     let mut expenses = HashMap::new();
@@ -72,4 +76,3 @@ fn read_input() -> HashMap<i32, i32> {
 
     return expenses;
 }
-
