@@ -29,15 +29,15 @@ fn solve_problem_1_phase_1() -> i32 {
 fn solve_problem_1_phase_2() -> i32 {
     let input = read_input();
 
-    for (num1, countNum1) in input.iter() {
+    for (num1, count_num_1) in input.iter() {
         // 3a = 2020
-        if *countNum1 >= 3 && num1 * 3 == 2020 {
+        if *count_num_1 >= 3 && num1 * 3 == 2020 {
             println!("Result (phase2) is {} * {} * {} = {}", num1, num1, num1, num1 * num1 * num1);
             return num1 * num1 * num1;
         }
 
         // a+a+remaining=2020
-        if *countNum1 >= 2 {
+        if *count_num_1 >= 2 {
             let remaining = 2020 - 2 * num1;
             if input.contains_key(&remaining) {
                 println!("Result (phase2) is {} * {} * {} = {}", num1, num1, remaining, num1 * num1 * remaining);
