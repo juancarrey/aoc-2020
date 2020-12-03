@@ -4,20 +4,41 @@ use std::io::prelude::*;
 use std::fs::File;
 
 fn main() {
- solve_day_3(1);   
+    solve_day_3_phase_1();
+    solve_day_3_phase_2();   
 }
 
-fn solve_day_3(phase: i32) {
-    let map: Vec<String> = parse_file();
-    const slope: usize = 3;
+fn solve_day_3_phase_1() {
+    let trees =  count_trees(&parse_file(), 3, 1);
+    println!("Day 3 Phase 1 => Trees {}", trees);
+}
 
-    let trees = map
+fn solve_day_3_phase_2() {
+    let map = parse_file();
+    let result = 
+        count_trees(&map, 1, 1) *
+        count_trees(&map, 3, 1) *
+        count_trees(&map, 5, 1) *
+        count_trees(&map, 7, 1) *
+        count_trees(&map, 1, 2);
+
+    println!("Day 3 Phase 2 => Trees {}", result);
+}
+
+fn count_trees(map: &Vec<String>, x_slope: usize, y_slope: usize) -> usize {
+    map
+        // Remove lines by "y" jump
         .iter()
         .enumerate()
-        .filter(|&(idx, tile)| is_tree(tile, idx * slope % tile.len()))
-        .count();
-
-    println!("Day 3 Phase {} => Trees {}", phase, trees);
+        .filter(|&(idx, _)| idx % y_slope == 0)
+        .map(|(_, tile)| tile)
+        .collect::<Vec<&String>>()
+        // Remove non-tree lines by "x" jump
+        .iter()
+        .enumerate()
+        .filter(|&(idx, tile)| is_tree(tile, idx * x_slope % tile.len()))
+        // Count trees
+        .count()
 }
 
 fn is_tree(tile: &String, pos: usize) -> bool {
