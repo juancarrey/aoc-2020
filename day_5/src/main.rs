@@ -10,10 +10,12 @@ fn main() {
         .map(|string| seat_id(parse_boarding_pass(string.to_string())))
         .collect::<HashSet<usize>>();
 
-    let max_seat_id = passes.iter().max().unwrap();
-    println!("Day 5 Phase 1. Max Boarding Pass = {}", max_seat_id);
+    let min = passes.iter().min().unwrap();
+    let max = passes.iter().max().unwrap();
 
-    for possible_seat_id in 32..*max_seat_id {
+    println!("Day 5 Phase 1. Max Boarding Pass = {}", max);
+
+    for possible_seat_id in *min+1..*max-1 {
         if !passes.contains(&possible_seat_id) {
             println!("Day 5 Phase 2. Your Seat ID = {}", possible_seat_id);
         }
