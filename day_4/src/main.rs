@@ -1,19 +1,75 @@
-use std::path::Path;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::fs::File;
+use regex::Regex;
 
 fn main() {
     solve_day_4_phase_1();
-    // solve_day_4_phase_2();
+    solve_day_4_phase_2();
 }
 
+#[derive(Debug)]
 struct Color(String);
+#[derive(Debug)]
 struct PassportID(String);
+#[derive(Debug)]
 struct CountryID(String);
+#[derive(Debug)]
 struct Year(usize);
+#[derive(Debug)]
 struct Height(String);
 
+impl Color {
+    fn valid_hair_color(self) -> bool {
+        return self.0.chars().nth(0) == Some('#') && 
+            Regex::new(r"^[a-f0-9]{6}$").unwrap().is_match(&self.0)
+    }
+
+    fn valid_eye_color(self) -> bool {
+        [
+            String::from("amb"),
+            String::from("blu"),
+            String::from("brn"),
+            String::from("gry"),
+            String::from("grn"),
+            String::from("hzl"),
+            String::from("oth")
+        ].iter().any(|ec| *ec == self.0)
+    }
+}
+
+impl Year {
+    fn valid(self, min: usize, max: usize) -> bool  {
+        return self.0 >= min && self.0 <= max;
+    }
+}
+
+impl PassportID {
+    fn valid(self) -> bool {
+        return Regex::new(r"^[0-9]{9}$").unwrap().is_match(&self.0)
+    }
+}
+
+impl Height {
+    fn valid(self) -> bool {
+        if self.0.ends_with("cm") { 
+            let height = self.val();
+            height >= 150 && height <= 193    
+        } else if self.0.ends_with("in") {
+            let height = self.val();
+            height >= 59 && height <= 76
+        } else {
+            false
+        }
+    }
+
+    fn val(self) -> usize {
+        self.0[0..(self.0.len() - 2)].parse::<usize>().unwrap()
+    }
+}
+
+
+#[derive(Debug)]/
 struct Passport {
     byr: Option<Year>,
     iyr: Option<Year>,
@@ -40,10 +96,10 @@ impl Passport {
     }
 
     fn valid(self, phase: i32) -> bool {
-        return self.valid_phase_1();
+        return if phase == 1 { self.valid_phase_1() } else { self.valid_phase_2() }
     }
 
-    fn valid_phase_1(self) -> bool {
+    fn valid_phase_1(&self) -> bool {
         return
             self.byr.is_some() &&
             self.iyr.is_some() &&
@@ -55,7 +111,16 @@ impl Passport {
     }
 
     fn valid_phase_2(self) -> bool {
-        return false;
+        let valid = self.valid_phase_1() && 
+            self.byr.unwrap().valid(1920, 2002) &&
+            self.iyr.unwrap().valid(2010, 2020) && 
+            self.eyr.unwrap().valid(2020, 2030) && 
+            self.hgt.unwrap().valid() && 
+            self.hcl.unwrap().valid_hair_color() && 
+            self.ecl.unwrap().valid_eye_color() && 
+            self.pid.unwrap().valid();
+        println!("{:?} {}", &self, valid);
+        valid
     }
 }
 
@@ -110,7 +175,7 @@ fn read_file() -> Vec<String> {
 
     let mut list = Vec::new();
     let mut current: String = String::from(" ");
-    for (line) in file.lines() {
+    for line in file.lines() {
         let item = line.unwrap();
         if item.is_empty() {
             current.push_str(&" ".to_string());
