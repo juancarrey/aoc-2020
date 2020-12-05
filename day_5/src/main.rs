@@ -1,18 +1,23 @@
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::fs::File;
+use std::collections::HashSet;
 
 fn main() {
-    solve_day_5(1);
-}
-
-fn solve_day_5(phase: i32) {
     let data = read_file();
 
-    let max_boarding_pass_id: usize = data.iter()
+    let passes: HashSet<usize> = data.iter()
         .map(|string| seat_id(parse_boarding_pass(string.to_string())))
-        .max().unwrap();
-        println!("Day 5 Phase 1. Max Boarding Pass ={}", max_boarding_pass_id);
+        .collect::<HashSet<usize>>();
+
+    let max_seat_id = passes.iter().max().unwrap();
+    println!("Day 5 Phase 1. Max Boarding Pass = {}", max_seat_id);
+
+    for possible_seat_id in 32..*max_seat_id {
+        if !passes.contains(&possible_seat_id) {
+            println!("Day 5 Phase 2. Your Seat ID = {}", possible_seat_id);
+        }
+    }
 }
 
 // BP = [lower_row, upper_row, lower_column, upper_column]
