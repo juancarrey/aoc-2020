@@ -21,8 +21,7 @@ struct Height(String);
 
 impl Color {
     fn valid_hair_color(self) -> bool {
-        return self.0.chars().nth(0) == Some('#') && 
-            Regex::new(r"^[a-f0-9]{6}$").unwrap().is_match(&self.0)
+        return Regex::new(r"^#[a-f0-9]{6}$").unwrap().is_match(&self.0)
     }
 
     fn valid_eye_color(self) -> bool {
@@ -69,7 +68,7 @@ impl Height {
 }
 
 
-#[derive(Debug)]/
+#[derive(Debug)]
 struct Passport {
     byr: Option<Year>,
     iyr: Option<Year>,
@@ -111,16 +110,17 @@ impl Passport {
     }
 
     fn valid_phase_2(self) -> bool {
-        let valid = self.valid_phase_1() && 
-            self.byr.unwrap().valid(1920, 2002) &&
-            self.iyr.unwrap().valid(2010, 2020) && 
-            self.eyr.unwrap().valid(2020, 2030) && 
-            self.hgt.unwrap().valid() && 
-            self.hcl.unwrap().valid_hair_color() && 
-            self.ecl.unwrap().valid_eye_color() && 
-            self.pid.unwrap().valid();
-        println!("{:?} {}", &self, valid);
-        valid
+        if !self.valid_phase_1() { 
+            return false;
+        }
+        let byr = self.byr.unwrap().valid(1920, 2002);
+        let iyr = self.iyr.unwrap().valid(2010, 2020);
+        let eyr = self.eyr.unwrap().valid(2020, 2030);
+        let hgt = self.hgt.unwrap().valid();
+        let hcl = self.hcl.unwrap().valid_hair_color();
+        let ecl = self.ecl.unwrap().valid_eye_color();
+        let pid = self.pid.unwrap().valid();
+        return byr && iyr && eyr && hgt && hcl && ecl && pid;
     }
 }
 
