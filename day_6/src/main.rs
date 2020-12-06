@@ -33,7 +33,7 @@ fn phase_2() {
 fn count_group_yes_answers(group_answers: Vec<&str>) -> usize {
     let mut answers : HashMap<char, usize> = HashMap::new();
     group_answers.iter()
-        .map(|answers| answers.chars().filter(|x| *x != ' '))
+        .map(|answers| answers.chars())
         .flatten()
         .collect::<Vec<char>>()
         .iter()
