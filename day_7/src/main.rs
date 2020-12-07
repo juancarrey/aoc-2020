@@ -7,13 +7,26 @@ use regex::Regex;
 
 fn main() {
     let (bag_contains, bag_contained_in) = create_graph();
-    phase_1(bag_contains, bag_contained_in);
+    phase_1(bag_contained_in);
+    phase_2(bag_contains);
 }
 
 type Graph = HashMap<String, HashMap<String, usize>>;
 
+fn phase_2(bag_contains: Graph) {
+    let how_many_bags = open(&bag_contains, &bag_contains.get("shiny gold").unwrap());
+    println!("Day 7 Phase 2: {}", how_many_bags);
+}
 
-fn phase_1(bag_contains: Graph, bag_contained_in: Graph) {
+fn open(bag_contains: &Graph, bag: &HashMap<String, usize>) -> usize {
+    if bag.is_empty() { return 0; }
+
+    bag.iter()
+        .map(|(contained_bag, times)| times + times * open(bag_contains, &bag_contains.get(contained_bag).unwrap()))
+        .sum()
+}
+
+fn phase_1(bag_contained_in: Graph) {
     let (set, count) = traverse(&bag_contained_in, vec!["shiny gold"], HashSet::new(), 0);
     println!("Day 7 Phase 1: {}", set.len() - 1);
 }
@@ -24,8 +37,6 @@ fn traverse(graph: &Graph, to_add: Vec<&str>, mut visited: HashSet<String>, curr
     if new_nodes.is_empty() {
         return (visited, current_count);
     }
-
-    println!("to_add=[{:?}], visited={:?}, current_count={}", to_add, visited, current_count);
 
     let next_to_add: Vec<&str> = new_nodes.iter()
         .flat_map(|new_node| graph.get(*new_node).unwrap().keys())
