@@ -26,9 +26,6 @@ fn phase_2() {
     println!("Day 8 Phase 2: {} ", result.0);
 }
 
-// Ejecutar programa desde cada linea y calcular LOC[i] = [Sin cambiar nada]
-// Mirar desde cada linea a dónde voy cambiandolo LOC[i] swap => LOC[x] sin cambiar nada. (He de ir a una linea donde se puede llegar sin cambiar nada)
-
 fn create_program() -> Program {
     read_file().iter().map(|line| {
         let instruction: Vec<&str> = line.split(' ').collect();
