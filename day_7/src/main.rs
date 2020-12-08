@@ -13,6 +13,27 @@ fn main() {
 
 type Graph = HashMap<String, HashMap<String, usize>>;
 
+fn phase_1(bag_contained_in: Graph) {
+    let bags = traverse(&bag_contained_in, vec!["shiny gold"], HashSet::new());
+    println!("Day 7 Phase 1: {}", bags.len() - 1);
+}
+
+fn traverse(graph: &Graph, to_add: Vec<&str>, mut visited: HashSet<String>) -> HashSet<String> {
+    let new_nodes: Vec<&str> = to_add.iter().filter(|x| !visited.contains(**x)).map(|x| *x).collect();
+    
+    if new_nodes.is_empty() {
+        return visited;
+    }
+
+    let next_to_add: Vec<&str> = new_nodes.iter()
+        .flat_map(|new_node| graph.get(*new_node).unwrap().keys())
+        .map(|x| x.as_str())
+        .collect();
+    to_add.iter().for_each(|x| { visited.insert(x.to_string()); });
+
+    return traverse(graph, next_to_add, visited)
+}
+
 fn phase_2(bag_contains: Graph) {
     let how_many_bags = open(&bag_contains, &bag_contains.get("shiny gold").unwrap());
     println!("Day 7 Phase 2: {}", how_many_bags);
@@ -26,33 +47,11 @@ fn open(bag_contains: &Graph, bag: &HashMap<String, usize>) -> usize {
         .sum()
 }
 
-fn phase_1(bag_contained_in: Graph) {
-    let (set, count) = traverse(&bag_contained_in, vec!["shiny gold"], HashSet::new(), 0);
-    println!("Day 7 Phase 1: {}", set.len() - 1);
-}
-
-fn traverse(graph: &Graph, to_add: Vec<&str>, mut visited: HashSet<String>, current_count: usize) -> (HashSet<String>, usize) {
-    let new_nodes: Vec<&str> = to_add.iter().filter(|x| !visited.contains(**x)).map(|x| *x).collect();
-    
-    if new_nodes.is_empty() {
-        return (visited, current_count);
-    }
-
-    let next_to_add: Vec<&str> = new_nodes.iter()
-        .flat_map(|new_node| graph.get(*new_node).unwrap().keys())
-        .map(|x| x.as_str())
-        .collect();
-    to_add.iter().for_each(|x| { visited.insert(x.to_string()); });
-
-    return traverse(graph, next_to_add, visited, 0)
-}
-
 fn create_graph() -> (Graph, Graph) {
     let mut bag_contains: Graph = HashMap::new();
     let mut bag_contained_in: Graph = HashMap::new();
-
-    // N bright white bag
     let contains_regex = Regex::new(r"(\d+) ([a-z ]+) bags?.?").unwrap();
+
     read_file().iter().for_each(|rule| {
         let bag = rule.split("bags").nth(0).unwrap().trim();
         let contains_str: Vec<&str> = rule.split("contain").nth(1).unwrap()
